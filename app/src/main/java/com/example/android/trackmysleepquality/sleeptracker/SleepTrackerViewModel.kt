@@ -34,7 +34,6 @@ class SleepTrackerViewModel(
     application: Application
 ) : AndroidViewModel(application) {
 
-
     private var viewModelJob = Job()
 
     override fun onCleared() {
@@ -51,13 +50,31 @@ class SleepTrackerViewModel(
         formatNights(nights, application.resources)
     }
 
-
     private val _navigateToSleepQuality = MutableLiveData<SleepNight>()
     val navigateToSleepQuality: LiveData<SleepNight>
         get() = _navigateToSleepQuality
 
     fun doneNavigating() {
         _navigateToSleepQuality.value = null
+    }
+
+    val startButtonVisible = Transformations.map(tonight) {
+        null == it
+    }
+    val stopButtonVisible = Transformations.map(tonight) {
+        null != it
+    }
+    val clearButtonVisible = Transformations.map(nights) {
+        it?.isNotEmpty()
+    }
+
+    private var _showSnackbarEvent = MutableLiveData<Boolean>()
+
+    val showSnackBarEvent: LiveData<Boolean>
+        get() = _showSnackbarEvent
+
+    fun doneShowingSnackbar() {
+        _showSnackbarEvent.value = false
     }
 
     init {
@@ -115,6 +132,7 @@ class SleepTrackerViewModel(
             clear()
             tonight.value = null
         }
+        _showSnackbarEvent.value = true
     }
 
     private suspend fun clear() {
